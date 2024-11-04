@@ -1,3 +1,4 @@
+alert("JavaScript file is loaded!");
 const SHEET_ID = "1vGJXAyyjTgTdC00yIWB-BUcnmFLVWwnDJxCuIs0zvuI";  // Your Google Sheet ID
 const API_KEY = "AIzaSyBdFf4wtcwb9hBzMk94oRa5iY7Keydns94";         // Your Google Sheets API Key
 const SHEET_NAME = "Glide Cinema Gear List";                        // Your sheet tab name
