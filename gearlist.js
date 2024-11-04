@@ -1,13 +1,41 @@
-document.addEventListener("DOMContentLoaded", () => {
-    const addGearButton = document.getElementById("add-gear");
-    const printButton = document.getElementById("print-list");
+const SHEET_ID = "1vGJXAyyjTgTdC00yIWB-BUcnmFLVWwnDJxCuIs0zvuI";  // Your Google Sheet ID
+const API_KEY = "AIzaSyBdFf4wtcwb9hBzMk94oRa5iY7Keydns94";         // Your Google Sheets API Key
+const SHEET_NAME = "Glide Cinema Gear List";                        // Your sheet tab name
 
-    if (addGearButton) addGearButton.addEventListener("click", addGearRow);
-    if (printButton) printButton.addEventListener("click", printPDF);
+let gearData = {};
 
-    // Initial test row
-    addGearRow();
-});
+async function fetchData() {
+    try {
+        const response = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${SHEET_NAME}?key=${API_KEY}`);
+        if (!response.ok) throw new Error("Network response was not ok");
+        const data = await response.json();
+        console.log("Fetched Data:", data);
+        processData(data.values);
+    } catch (error) {
+        console.error("Failed to fetch data:", error);
+    }
+}
+
+function processData(rows) {
+    console.log("Processing Data...");
+    if (!rows || rows.length === 0) {
+        console.error("No data found in Google Sheet.");
+        return;
+    }
+
+    const headers = rows[0];
+    headers.forEach(header => gearData[header] = []);
+    rows.slice(1).forEach(row => {
+        row.forEach((item, index) => {
+            const header = headers[index];
+            if (!gearData[header].includes(item)) {
+                gearData[header].push(item);
+            }
+        });
+    });
+    console.log("Processed Gear Data:", gearData);
+    addGearRow();  // Add an initial row when data is ready
+}
 
 function createDropdown(options, className) {
     const dropdown = document.createElement("select");
@@ -32,12 +60,23 @@ function addGearRow() {
     const newRow = document.createElement("div");
     newRow.className = "gear-row";
 
-    // Add dropdowns with placeholder options for each category
-    newRow.appendChild(createDropdown(['Sample Owner'], 'Owner'));
-    newRow.appendChild(createDropdown(['Sample Category'], 'Category'));
-    newRow.appendChild(createDropdown(['Sample Camera'], 'Camera'));
-    newRow.appendChild(createDropdown(['Sample Drone'], 'Drone'));
-    newRow.appendChild(createDropdown(['Sample Lighting'], 'Lighting'));
+    // Add dropdowns for each category
+    newRow.appendChild(createDropdown(gearData['Owner'], 'Owner'));
+    newRow.appendChild(createDropdown(gearData['Category'], 'Category'));
+    newRow.appendChild(createDropdown(gearData['Camera'], 'Camera'));
+    newRow.appendChild(createDropdown(gearData['Drone'], 'Drone'));
+    newRow.appendChild(createDropdown(gearData['Lighting'], 'Lighting'));
+    newRow.appendChild(createDropdown(gearData['Diff/Attach'], 'Diff/Attach'));
+    newRow.appendChild(createDropdown(gearData['Lenses'], 'Lenses'));
+    newRow.appendChild(createDropdown(gearData['Audio'], 'Audio'));
+    newRow.appendChild(createDropdown(gearData['Camera Support'], 'Camera Support'));
+    newRow.appendChild(createDropdown(gearData['Monitoring'], 'Monitoring'));
+    newRow.appendChild(createDropdown(gearData['Stands'], 'Stands'));
+    newRow.appendChild(createDropdown(gearData['GE'], 'GE'));
+    newRow.appendChild(createDropdown(gearData['Grip'], 'Grip'));
+    newRow.appendChild(createDropdown(gearData['Battery'], 'Battery'));
+    newRow.appendChild(createDropdown(gearData['Media'], 'Media'));
+    newRow.appendChild(createDropdown(gearData['Extra'], 'Extra'));
 
     // Add Check Out and Check In checkboxes
     const checkOutBox = document.createElement("input");
@@ -56,3 +95,14 @@ function addGearRow() {
 function printPDF() {
     window.print();
 }
+
+// Event Listeners
+document.addEventListener("DOMContentLoaded", () => {
+    const addGearButton = document.getElementById("add-gear");
+    const printButton = document.getElementById("print-list");
+
+    if (addGearButton) addGearButton.addEventListener("click", addGearRow);
+    if (printButton) printButton.addEventListener("click", printPDF);
+
+    fetchData();  // Fetch data on page load
+});
