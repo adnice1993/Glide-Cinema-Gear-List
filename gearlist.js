@@ -1,4 +1,3 @@
-alert("JavaScript file is loaded!");
 const SHEET_ID = "1vGJXAyyjTgTdC00yIWB-BUcnmFLVWwnDJxCuIs0zvuI";  // Your Google Sheet ID
 const API_KEY = "AIzaSyBdFf4wtcwb9hBzMk94oRa5iY7Keydns94";         // Your Google Sheets API Key
 const SHEET_NAME = "Glide Cinema Gear List";                        // Your sheet tab name
@@ -19,6 +18,11 @@ async function fetchData() {
 
 function processData(rows) {
     console.log("Processing Data...");
+    if (!rows || rows.length === 0) {
+        console.error("No data found in Google Sheet.");
+        return;
+    }
+
     const headers = rows[0];
     headers.forEach(header => gearData[header] = []);
     rows.slice(1).forEach(row => {
@@ -30,7 +34,7 @@ function processData(rows) {
         });
     });
     console.log("Processed Gear Data:", gearData);
-    addGearRow();
+    addGearRow();  // Ensure at least one row is added on load
 }
 
 function createDropdown(options, className) {
@@ -48,6 +52,11 @@ function createDropdown(options, className) {
 
 function addGearRow() {
     const gearTable = document.getElementById("gear-table");
+    if (!gearTable) {
+        console.error("gear-table element not found");
+        return;
+    }
+    
     const newRow = document.createElement("div");
     newRow.className = "gear-row";
 
@@ -88,8 +97,12 @@ function printPDF() {
 }
 
 // Event Listeners
-document.getElementById("add-gear").addEventListener("click", addGearRow);
-document.getElementById("print-list").addEventListener("click", printPDF);
+document.addEventListener("DOMContentLoaded", () => {
+    const addGearButton = document.getElementById("add-gear");
+    const printButton = document.getElementById("print-list");
 
-fetchData();
+    if (addGearButton) addGearButton.addEventListener("click", addGearRow);
+    if (printButton) printButton.addEventListener("click", printPDF);
 
+    fetchData();  // Fetch data on page load
+});
