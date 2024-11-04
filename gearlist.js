@@ -19,77 +19,77 @@ async function fetchData() {
 
 function processData(rows) {
     console.log("Processing Data...");
+    const headers = rows[0];
+    headers.forEach(header => gearData[header] = []);
     rows.slice(1).forEach(row => {
-        const [category, owner, gear] = row;
-        if (!gearData[owner]) gearData[owner] = {};
-        if (!gearData[owner][category]) gearData[owner][category] = [];
-        gearData[owner][category].push(gear);
+        row.forEach((item, index) => {
+            const header = headers[index];
+            if (!gearData[header].includes(item)) {
+                gearData[header].push(item);
+            }
+        });
     });
     console.log("Processed Gear Data:", gearData);
-    populateOwnerOptions();
+    addGearRow();
 }
 
-function populateOwnerOptions() {
-    const ownerDropdown = document.querySelector(".owner-dropdown");
-    ownerDropdown.innerHTML = '<option value="">Select Owner</option>';
-    Object.keys(gearData).forEach(owner => {
-        const option = document.createElement("option");
-        option.value = owner;
-        option.textContent = owner;
-        ownerDropdown.appendChild(option);
+function createDropdown(options, className) {
+    const dropdown = document.createElement("select");
+    dropdown.className = className;
+    dropdown.innerHTML = `<option value="">Select ${className}</option>`;
+    options.forEach(option => {
+        const opt = document.createElement("option");
+        opt.value = option;
+        opt.textContent = option;
+        dropdown.appendChild(opt);
     });
-}
-
-function populateCategoryOptions(ownerDropdown) {
-    const selectedOwner = ownerDropdown.value;
-    const categoryDropdown = ownerDropdown.nextElementSibling;
-    categoryDropdown.innerHTML = '<option value="">Select Category</option>';
-    const gearDropdown = categoryDropdown.nextElementSibling;
-    gearDropdown.innerHTML = '<option value="">Select Gear</option>';
-
-    if (selectedOwner && gearData[selectedOwner]) {
-        Object.keys(gearData[selectedOwner]).forEach(category => {
-            const option = document.createElement("option");
-            option.value = category;
-            option.textContent = category;
-            categoryDropdown.appendChild(option);
-        });
-    }
-}
-
-function populateGearOptions(categoryDropdown) {
-    const selectedOwner = categoryDropdown.previousElementSibling.value;
-    const selectedCategory = categoryDropdown.value;
-    const gearDropdown = categoryDropdown.nextElementSibling;
-    gearDropdown.innerHTML = '<option value="">Select Gear</option>';
-
-    if (selectedOwner && selectedCategory && gearData[selectedOwner][selectedCategory]) {
-        gearData[selectedOwner][selectedCategory].forEach(gear => {
-            const option = document.createElement("option");
-            option.value = gear;
-            option.textContent = gear;
-            gearDropdown.appendChild(option);
-        });
-    }
+    return dropdown;
 }
 
 function addGearRow() {
     const gearTable = document.getElementById("gear-table");
     const newRow = document.createElement("div");
     newRow.className = "gear-row";
-    newRow.innerHTML = `
-        <select class="dropdown owner-dropdown" onchange="populateCategoryOptions(this)">
-            <option value="">Select Owner</option>
-            ${Object.keys(gearData).map(owner => `<option value="${owner}">${owner}</option>`).join("")}
-        </select>
-        <select class="dropdown category-dropdown" onchange="populateGearOptions(this)">
-            <option value="">Select Category</option>
-        </select>
-        <select class="dropdown gear-dropdown">
-            <option value="">Select Gear</option>
-        </select>
-    `;
+
+    // Add dropdowns for each category
+    newRow.appendChild(createDropdown(gearData['Owner'], 'Owner'));
+    newRow.appendChild(createDropdown(gearData['Category'], 'Category'));
+    newRow.appendChild(createDropdown(gearData['Camera'], 'Camera'));
+    newRow.appendChild(createDropdown(gearData['Drone'], 'Drone'));
+    newRow.appendChild(createDropdown(gearData['Lighting'], 'Lighting'));
+    newRow.appendChild(createDropdown(gearData['Diff/Attach'], 'Diff/Attach'));
+    newRow.appendChild(createDropdown(gearData['Lenses'], 'Lenses'));
+    newRow.appendChild(createDropdown(gearData['Audio'], 'Audio'));
+    newRow.appendChild(createDropdown(gearData['Camera Support'], 'Camera Support'));
+    newRow.appendChild(createDropdown(gearData['Monitoring'], 'Monitoring'));
+    newRow.appendChild(createDropdown(gearData['Stands'], 'Stands'));
+    newRow.appendChild(createDropdown(gearData['GE'], 'GE'));
+    newRow.appendChild(createDropdown(gearData['Grip'], 'Grip'));
+    newRow.appendChild(createDropdown(gearData['Battery'], 'Battery'));
+    newRow.appendChild(createDropdown(gearData['Media'], 'Media'));
+    newRow.appendChild(createDropdown(gearData['Extra'], 'Extra'));
+
+    // Add Check Out and Check In checkboxes
+    const checkOutBox = document.createElement("input");
+    checkOutBox.type = "checkbox";
+    checkOutBox.className = "CheckOut";
+    newRow.appendChild(checkOutBox);
+
+    const checkInBox = document.createElement("input");
+    checkInBox.type = "checkbox";
+    checkInBox.className = "CheckIn";
+    newRow.appendChild(checkInBox);
+
     gearTable.appendChild(newRow);
 }
 
+function printPDF() {
+    window.print();
+}
+
+// Event Listeners
+document.getElementById("add-gear").addEventListener("click", addGearRow);
+document.getElementById("print-list").addEventListener("click", printPDF);
+
 fetchData();
+
