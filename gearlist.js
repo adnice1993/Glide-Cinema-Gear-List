@@ -1,42 +1,24 @@
-const SHEET_ID = "1vGJXAyyjTgTdC00yIWB-BUcnmFLVWwnDJxCuIs0zvuI";  // Your Google Sheet ID
-const API_KEY = "AIzaSyBdFf4wtcwb9hBzMk94oRa5iY7Keydns94";         // Your Google Sheets API Key
-const SHEET_NAME = "Glide Cinema Gear List";                        // Your sheet tab name
+// List of options for each column dropdown
+const optionsData = {
+    Owner: ["Glide Cinema", "Kodiak Films", "Chronicle Cinema", "Filmhaus", "Alpha Line Media"],
+    Category: ["Category A", "Category B", "Category C"],
+    Camera: ["Camera A", "Camera B", "Camera C"],
+    Drone: ["Drone A", "Drone B", "Drone C"],
+    Lighting: ["Lighting A", "Lighting B", "Lighting C"],
+    "Diff/Attach": ["Diffuser A", "Attachment B", "Attachment C"],
+    Lenses: ["Lens A", "Lens B", "Lens C"],
+    Audio: ["Audio A", "Audio B", "Audio C"],
+    "Camera Support": ["Support A", "Support B", "Support C"],
+    Monitoring: ["Monitor A", "Monitor B", "Monitor C"],
+    Stands: ["Stand A", "Stand B", "Stand C"],
+    GE: ["GE A", "GE B", "GE C"],
+    Grip: ["Grip A", "Grip B", "Grip C"],
+    Battery: ["Battery A", "Battery B", "Battery C"],
+    Media: ["Media A", "Media B", "Media C"],
+    Extra: ["Extra A", "Extra B", "Extra C"],
+};
 
-let gearData = {};
-
-async function fetchData() {
-    try {
-        const response = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${SHEET_NAME}?key=${API_KEY}`);
-        if (!response.ok) throw new Error("Network response was not ok");
-        const data = await response.json();
-        console.log("Fetched Data:", data);
-        processData(data.values);
-    } catch (error) {
-        console.error("Failed to fetch data:", error);
-    }
-}
-
-function processData(rows) {
-    console.log("Processing Data...");
-    if (!rows || rows.length === 0) {
-        console.error("No data found in Google Sheet.");
-        return;
-    }
-
-    const headers = rows[0];
-    headers.forEach(header => gearData[header] = []);
-    rows.slice(1).forEach(row => {
-        row.forEach((item, index) => {
-            const header = headers[index];
-            if (!gearData[header].includes(item)) {
-                gearData[header].push(item);
-            }
-        });
-    });
-    console.log("Processed Gear Data:", gearData);
-    addGearRow();  // Add an initial row when data is ready
-}
-
+// Function to create a dropdown for each column
 function createDropdown(options, className) {
     const dropdown = document.createElement("select");
     dropdown.className = className;
@@ -50,48 +32,22 @@ function createDropdown(options, className) {
     return dropdown;
 }
 
+// Function to add a row to the table
 function addGearRow() {
     const gearTable = document.getElementById("gear-table");
-    if (!gearTable) {
-        console.error("gear-table element not found");
-        return;
-    }
-
     const newRow = document.createElement("div");
     newRow.className = "gear-row";
 
-    // Add dropdowns for each category
-    newRow.appendChild(createDropdown(gearData['Owner'], 'Owner'));
-    newRow.appendChild(createDropdown(gearData['Category'], 'Category'));
-    newRow.appendChild(createDropdown(gearData['Camera'], 'Camera'));
-    newRow.appendChild(createDropdown(gearData['Drone'], 'Drone'));
-    newRow.appendChild(createDropdown(gearData['Lighting'], 'Lighting'));
-    newRow.appendChild(createDropdown(gearData['Diff/Attach'], 'Diff/Attach'));
-    newRow.appendChild(createDropdown(gearData['Lenses'], 'Lenses'));
-    newRow.appendChild(createDropdown(gearData['Audio'], 'Audio'));
-    newRow.appendChild(createDropdown(gearData['Camera Support'], 'Camera Support'));
-    newRow.appendChild(createDropdown(gearData['Monitoring'], 'Monitoring'));
-    newRow.appendChild(createDropdown(gearData['Stands'], 'Stands'));
-    newRow.appendChild(createDropdown(gearData['GE'], 'GE'));
-    newRow.appendChild(createDropdown(gearData['Grip'], 'Grip'));
-    newRow.appendChild(createDropdown(gearData['Battery'], 'Battery'));
-    newRow.appendChild(createDropdown(gearData['Media'], 'Media'));
-    newRow.appendChild(createDropdown(gearData['Extra'], 'Extra'));
-
-    // Add Check Out and Check In checkboxes
-    const checkOutBox = document.createElement("input");
-    checkOutBox.type = "checkbox";
-    checkOutBox.className = "CheckOut";
-    newRow.appendChild(checkOutBox);
-
-    const checkInBox = document.createElement("input");
-    checkInBox.type = "checkbox";
-    checkInBox.className = "CheckIn";
-    newRow.appendChild(checkInBox);
+    // Create dropdowns for each column
+    for (const column in optionsData) {
+        const dropdown = createDropdown(optionsData[column], column);
+        newRow.appendChild(dropdown);
+    }
 
     gearTable.appendChild(newRow);
 }
 
+// Function to print the table
 function printPDF() {
     window.print();
 }
@@ -104,5 +60,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (addGearButton) addGearButton.addEventListener("click", addGearRow);
     if (printButton) printButton.addEventListener("click", printPDF);
 
-    fetchData();  // Fetch data on page load
+    // Add initial row on load
+    addGearRow();
 });
