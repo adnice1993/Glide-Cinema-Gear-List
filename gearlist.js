@@ -34,7 +34,7 @@ function processData(rows) {
         });
     });
     console.log("Processed Gear Data:", gearData);
-    addGearRow();  // Ensure at least one row is added on load
+    addGearRow();  // Add an initial row when data is ready
 }
 
 function createDropdown(options, className) {
@@ -66,43 +66,4 @@ function addGearRow() {
     newRow.appendChild(createDropdown(gearData['Camera'], 'Camera'));
     newRow.appendChild(createDropdown(gearData['Drone'], 'Drone'));
     newRow.appendChild(createDropdown(gearData['Lighting'], 'Lighting'));
-    newRow.appendChild(createDropdown(gearData['Diff/Attach'], 'Diff/Attach'));
-    newRow.appendChild(createDropdown(gearData['Lenses'], 'Lenses'));
-    newRow.appendChild(createDropdown(gearData['Audio'], 'Audio'));
-    newRow.appendChild(createDropdown(gearData['Camera Support'], 'Camera Support'));
-    newRow.appendChild(createDropdown(gearData['Monitoring'], 'Monitoring'));
-    newRow.appendChild(createDropdown(gearData['Stands'], 'Stands'));
-    newRow.appendChild(createDropdown(gearData['GE'], 'GE'));
-    newRow.appendChild(createDropdown(gearData['Grip'], 'Grip'));
-    newRow.appendChild(createDropdown(gearData['Battery'], 'Battery'));
-    newRow.appendChild(createDropdown(gearData['Media'], 'Media'));
-    newRow.appendChild(createDropdown(gearData['Extra'], 'Extra'));
-
-    // Add Check Out and Check In checkboxes
-    const checkOutBox = document.createElement("input");
-    checkOutBox.type = "checkbox";
-    checkOutBox.className = "CheckOut";
-    newRow.appendChild(checkOutBox);
-
-    const checkInBox = document.createElement("input");
-    checkInBox.type = "checkbox";
-    checkInBox.className = "CheckIn";
-    newRow.appendChild(checkInBox);
-
-    gearTable.appendChild(newRow);
-}
-
-function printPDF() {
-    window.print();
-}
-
-// Event Listeners
-document.addEventListener("DOMContentLoaded", () => {
-    const addGearButton = document.getElementById("add-gear");
-    const printButton = document.getElementById("print-list");
-
-    if (addGearButton) addGearButton.addEventListener("click", addGearRow);
-    if (printButton) printButton.addEventListener("click", printPDF);
-
-    fetchData();  // Fetch data on page load
-});
+    n
