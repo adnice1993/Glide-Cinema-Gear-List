@@ -1,4 +1,4 @@
-// List of options for each column dropdown
+// Predefined options for each column dropdown
 const optionsData = {
     Owner: ["Glide Cinema", "Kodiak Films", "Chronicle Cinema", "Filmhaus", "Alpha Line Media"],
     Category: ["Category A", "Category B", "Category C"],
@@ -35,6 +35,11 @@ function createDropdown(options, className) {
 // Function to add a row to the table
 function addGearRow() {
     const gearTable = document.getElementById("gear-table");
+    if (!gearTable) {
+        console.error("gear-table element not found");
+        return;
+    }
+
     const newRow = document.createElement("div");
     newRow.className = "gear-row";
 
@@ -52,14 +57,15 @@ function printPDF() {
     window.print();
 }
 
-// Event Listeners
+// Initialize page on load
 document.addEventListener("DOMContentLoaded", () => {
     const addGearButton = document.getElementById("add-gear");
     const printButton = document.getElementById("print-list");
 
+    // Add initial row on page load
+    addGearRow();
+
+    // Set up button listeners
     if (addGearButton) addGearButton.addEventListener("click", addGearRow);
     if (printButton) printButton.addEventListener("click", printPDF);
-
-    // Add initial row on load
-    addGearRow();
 });
